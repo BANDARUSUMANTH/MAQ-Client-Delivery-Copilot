@@ -1,0 +1,22 @@
+# Core Python Dependencies for Intelligent Client Delivery Agent
+pyautogen==0.2.35
+semantic-kernel>=1.3.0
+llama-index-core>=0.10.0
+llama-index-readers-file>=0.1.0
+llama-index-embeddings-huggingface>=0.2.0
+llama-index-vector-stores-chroma>=0.1.0
+llama-index-retrievers-bm25>=0.1.0
+chromadb>=0.5.0
+fastmcp>=0.1.0
+mcp>=1.0.0
+azure-monitor-opentelemetry>=1.6.0
+opentelemetry-api>=1.24.0
+opentelemetry-sdk>=1.24.0
+python-dotenv>=1.0.1
+pandas>=2.0.0
+requests>=2.31.0
+jinja2>=3.1.0
+sentence-transformers>=2.7.0
+pytest>=8.0.0
+fastapi>=0.110.0
+uvicorn>=0.28.0
