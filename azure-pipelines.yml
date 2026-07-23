@@ -1,0 +1,44 @@
+# Azure DevOps CI/CD Pipeline Config
+# Promotion: Dev -> Test validation pipeline
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.10'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(pythonVersion)'
+  displayName: 'Use Python $(pythonVersion)'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install Dependencies'
+
+- script: |
+    # Run dynamic validation tests
+    # Pre-seed vector db and mock outputs
+    python -m pytest --maxfail=1 --disable-warnings
+  displayName: 'Execute Automated Tests'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-*.xml'
+    testRunTitle: 'Intelligent Client Delivery Agent Python Tests'
+  displayName: 'Publish Unit Test Results'
+
+- script: |
+    # Dry run of ingestion and orchestration in a sandbox env
+    # Using environment variables to control tests
+    mkdir -p data
+    cp data/sharepoint_projects.csv data_temp.csv || true
+    echo "Running build ingestion test..."
+    python src/ingestion/ingest.py
+  displayName: 'Verify Ingestion & Database Construction Build'
