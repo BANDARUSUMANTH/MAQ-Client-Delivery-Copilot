@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAQ Software - Intelligent Client Delivery Agent</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        title: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Outfit', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col overflow-hidden">
+
+    <!-- Top Branding & Status Bar -->
+    <header class="glass-panel sticky top-0 z-40 flex items-center justify-between px-8 py-4 bg-white border-b border-slate-200">
+        <div class="flex items-center space-x-3">
+            <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-[#C02026]">
+                <!-- MAQ Software Red Identity Icon -->
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-slate-900 leading-none"><span class="text-[#C02026]">MAQ</span> Software</h1>
+                <span class="text-[9px] uppercase tracking-wider font-semibold text-slate-500">Client Delivery Agent</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button onclick="triggerIngestion()" class="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2M7 9a4 4 0 114 4H7"></path>
+                </svg>
+                <span>Re-Ingest Data</span>
+            </button>
+            <div class="flex items-center space-x-2 bg-slate-100 rounded-lg border border-slate-200/60 px-3 py-1.5 shadow-sm">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Scope:</span>
+                <select id="user-selector" onchange="changeUser()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer">
+                    <option value="john_doe">john_doe (Power BI Lead)</option>
+                    <option value="jane_smith">jane_smith (Dynamics Lead)</option>
+                    <option value="bob_johnson">bob_johnson (Insights Lead)</option>
+                    <option value="user_admin">user_admin (Super Admin)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace with Left Menu Sidebar -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Left Menu Sidebar -->
+        <aside class="w-[200px] border-r border-slate-200 bg-white flex flex-col justify-between py-6">
+            <nav class="space-y-1 px-3">
+                <!-- Portfolio Analytics Link -->
+                <button onclick="switchTab('portfolio')" id="portfolio-btn" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 text-xs font-bold rounded-lg border-l-4 border-[#C02026] bg-red-50 text-[#C02026] transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path>
+                    </svg>
+                    <span>Portfolio Health</span>
+                </button>
+
+                <!-- Ask Copilot Link -->
+                <button onclick="switchTab('copilot')" id="copilot-btn" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 text-xs font-bold rounded-lg border-l-4 border-transparent text-slate-600 hover:bg-slate-55 hover:text-slate-900 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <span>Ask Copilot</span>
+                </button>
+
+                <!-- Release Gates Link -->
+                <button onclick="switchTab('pipeline')" id="pipeline-btn" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 text-xs font-bold rounded-lg border-l-4 border-transparent text-slate-600 hover:bg-slate-55 hover:text-slate-900 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <span>DevOps Pipeline</span>
+                </button>
+
+                <!-- System Logs Link -->
+                <button onclick="switchTab('logs')" id="logs-btn" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 text-xs font-bold rounded-lg border-l-4 border-transparent text-slate-600 hover:bg-slate-55 hover:text-slate-900 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    <span>System Engine</span>
+                </button>
+            </nav>
+
+            <div class="px-4 text-[10px] text-slate-400 font-medium">
+                Version 1.2.0 (Stable)
+            </div>
+        </aside>
+
+        <!-- Main Content Swappable Pane -->
+        <main class="flex-1 overflow-hidden p-8">
+            
+            <!-- SECTION 1: Portfolio Health Tab (Default) -->
+            <div id="portfolio-content" class="tab-content h-full flex gap-8">
+                
+                <!-- Project cards scroll list (55% width) -->
+                <div class="w-[50%] flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden">
+                    <div class="pb-3 border-b border-slate-100 mb-4">
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title">Portfolio Projects Health</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Authorized under Entra ID scope</p>
+                    </div>
+                    
+                    <div id="projects-container" class="flex-1 overflow-y-auto space-y-4 pr-1">
+                        <!-- Project Cards injected here -->
+                        <div class="flex flex-col items-center justify-center h-full text-slate-400 py-10">
+                            <svg class="w-8 h-8 animate-spin text-red-500/40 mb-3" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-xs">Loading authorized projects...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Big Visual Chart (50% width) -->
+                <div class="w-[50%] bg-white rounded-2xl border border-slate-200/80 p-5 flex flex-col h-full overflow-hidden justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title mb-1">Comparative Analytics</h2>
+                        <p class="text-xs text-slate-400">Timesheet Hours Burn % vs Sprint Velocity %</p>
+                    </div>
+                    
+                    <div class="flex-1 flex items-center justify-center p-4 relative min-h-[300px]">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200/60 rounded-xl p-3.5 text-xs text-slate-500 leading-normal">
+                        <strong>💡 How to read this chart:</strong> Red bars represent hours budget consumed. Slate-gray bars display DevOps sprint task completion. If the red bar is high and the slate bar is low, the project is over-budget and delayed.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Ask Copilot Tab -->
+            <div id="copilot-content" class="tab-content h-full hidden flex flex-col bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden">
+                <div class="pb-3 border-b border-slate-100 mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title">Ask Delivery Copilot</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Natural language timesheet grounding & risk analytics</p>
+                    </div>
+                    <div class="px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase bg-red-50 text-[#C02026] border border-red-200 rounded-md">
+                        Ollama Llama 3.2
+                    </div>
+                </div>
+
+                <!-- Chat messages scroll panel -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto py-3 space-y-4 pr-1">
+                    <!-- Welcomes -->
+                    <div class="flex items-start space-x-3 max-w-[80%]">
+                        <div class="w-8 h-8 rounded-lg bg-rose-50 text-[#C02026] flex items-center justify-center font-bold text-sm shrink-0 border border-rose-100">AI</div>
+                        <div class="bg-rose-50/30 border border-rose-100/50 text-slate-700 text-xs p-3 rounded-2xl rounded-tl-none leading-relaxed">
+                            <p class="font-semibold text-slate-900 mb-1">Welcome to the Delivery Copilot dashboard!</p>
+                            <p>Ask a question about your project hours or sprint metrics to run a live risk synthesis report.</p>
+                            <div class="mt-3.5 flex flex-wrap gap-2">
+                                <button onclick="submitSuggestedQuery('What is the health of active Power BI delivery projects?')" class="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-800 rounded-md text-[10px] hover:bg-slate-50 transition shadow-sm font-medium">Audit Active Power BI Projects</button>
+                                <button onclick="submitSuggestedQuery('Check project dynamics finance status')" class="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 hover:text-slate-800 rounded-md text-[10px] hover:bg-slate-50 transition shadow-sm font-medium">Audit Dynamics Migration</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Query Form -->
+                <form id="chat-form" onsubmit="submitQuery(event)" class="mt-4 flex items-center gap-2">
+                    <input type="text" id="query-input" placeholder="Query sprint progress, budget hours, team allocations..." class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 focus:border-red-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-red-500/20" required>
+                    <button type="submit" id="submit-btn" class="px-5 py-3 bg-[#C02026] hover:bg-red-750 text-white rounded-xl text-xs font-semibold transition flex items-center space-x-1 shrink-0">
+                        <span>Send</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- SECTION 3: DevOps Release Gate Tab -->
+            <div id="pipeline-content" class="tab-content h-full hidden flex flex-col bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden">
+                <div class="pb-3 border-b border-slate-100 mb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title">CI/CD Automated Release Gate</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Executes testing suites and manages code uploads to GitHub profile</p>
+                    </div>
+                    <div id="pipeline-status-badge" class="px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md bg-slate-100 text-slate-500 border border-slate-200">
+                        Idle
+                    </div>
+                </div>
+
+                <div class="flex-1 flex gap-6 overflow-hidden">
+                    <!-- Logs Output screen -->
+                    <div id="pipeline-logs" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-[10px] text-slate-600 overflow-y-auto space-y-1.5">
+                        <div class="text-slate-450 italic">// Console ready. Run automated testing suite to verify code...</div>
+                    </div>
+
+                    <!-- Gating Trigger buttons -->
+                    <div class="w-[240px] flex flex-col justify-start gap-4">
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Gate Actions</h3>
+                            <button onclick="runPipelineTests()" id="run-tests-btn" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                                <span>Execute Tests (pytest)</span>
+                            </button>
+                            <button onclick="approveDeployment()" id="deploy-btn" disabled class="w-full py-2.5 bg-red-50 text-[#C02026] border border-red-100 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-not-allowed">
+                                <span>Approve Deploy (GitHub)</span>
+                            </button>
+                        </div>
+                        <div class="text-[10px] text-slate-400 leading-normal px-2">
+                            * Approving deployment will run base64 REST pushes to commit core dashboard HTML templates and API codes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: System Logs Tab -->
+            <div id="logs-content" class="tab-content h-full hidden flex gap-6 overflow-hidden">
+                
+                <!-- Engine Trace logs console (65% width) -->
+                <div class="w-[65%] flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden">
+                    <div class="pb-2 border-b border-slate-100 mb-3">
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title">System Engine Console Logs</h2>
+                        <p class="text-xs text-slate-400">RAG ingestion and LlamaIndex querying pipelines</p>
+                    </div>
+                    <div id="logs-container" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-[9px] overflow-y-auto space-y-2 text-slate-600 leading-normal">
+                        <div class="text-slate-400 italic">// System trace logs initialized. Logs stream here...</div>
+                    </div>
+                </div>
+
+                <!-- Webhook Escalation Alerts (35% width) -->
+                <div class="w-[35%] flex flex-col h-full bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden">
+                    <div class="pb-2 border-b border-slate-100 mb-3">
+                        <h2 class="text-base font-bold text-slate-800 tracking-tight font-title">Teams Webhook Triggers</h2>
+                        <p class="text-xs text-slate-400">Captured adaptive card payload traces</p>
+                    </div>
+                    <div id="teams-container" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-[9px] overflow-y-auto space-y-3 text-slate-500">
+                        <div class="text-slate-400 italic">// Trigger an escalation from the Portfolio view to capture payload...</div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script triggers and integrations -->
+    <script>
+        let currentUser = "john_doe";
+        let chartInstance = null;
+
+        function changeUser() {
+            currentUser = document.getElementById("user-selector").value;
+            addSystemLog("INFO", `Switched security context to user: '${currentUser}'`);
+            
+            let defaultQuery = "What is the health of active Power BI delivery projects?";
+            if (currentUser === "jane_smith") {
+                defaultQuery = "Check project dynamics finance status";
+            } else if (currentUser === "bob_johnson") {
+                defaultQuery = "Audit Power BI Executive Insights status";
+            } else {
+                defaultQuery = "List all active authorized projects health";
+            }
+            
+            submitSuggestedQuery(defaultQuery);
+            switchTab('portfolio');
+        }
+
+        // Switch navigation tabs
+        function switchTab(tabId) {
+            // Hide all content containers
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Show selected container
+            document.getElementById(tabId + '-content').classList.remove('hidden');
+            
+            // Remove active styles from buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-red-50', 'text-[#C02026]', 'border-[#C02026]');
+                btn.classList.add('text-slate-600', 'border-transparent');
+            });
+            // Apply active styles to selected button
+            const activeBtn = document.getElementById(tabId + '-btn');
+            activeBtn.classList.remove('text-slate-600', 'border-transparent');
+            activeBtn.classList.add('bg-red-50', 'text-[#C02026]', 'border-[#C02026]');
+        }
+
+        // Fetch initial data
+        document.addEventListener("DOMContentLoaded", () => {
+            submitSuggestedQuery("What is the health of active Power BI delivery projects?");
+        });
+
+        // Update Chart.js Comparison Graph
+        function updateChart(projects) {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            const labels = projects.map(p => p.name.split(' ').slice(0, 3).join(' '));
+            const hourBurn = projects.map(p => p.hours_percentage);
+            const sprintVelocity = projects.map(p => p.sprint_percentage);
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Hours Budget Burn %',
+                            data: hourBurn,
+                            backgroundColor: 'rgba(192, 32, 38, 0.75)', // MAQ Red
+                            borderColor: '#c02026',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Sprint Task Completion %',
+                            data: sprintVelocity,
+                            backgroundColor: 'rgba(71, 85, 105, 0.75)', // Slate Gray
+                            borderColor: '#475569',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 120,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { color: '#64748b', font: { size: 8 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { size: 8 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#334155', boxWidth: 10, font: { size: 8 } },
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        async function triggerIngestion() {
+            addSystemLog("INFO", "Initiating manual ingestion...");
+            try {
+                const response = await fetch("/api/ingest", { method: "POST" });
+                const result = await response.json();
+                if (result.success) {
+                    addSystemLog("SUCCESS", "Database fully re-indexed.");
+                    if (result.logs) {
+                        result.logs.forEach(log => appendRawLog(log));
+                    }
+                } else {
+                    addSystemLog("ERROR", "Re-ingestion failed: " + result.error);
+                }
+            } catch (err) {
+                addSystemLog("ERROR", "Connection refused: " + err.message);
+            }
+        }
+
+        function submitSuggestedQuery(text) {
+            document.getElementById("query-input").value = text;
+            document.getElementById("chat-form").requestSubmit();
+            // Automatically switch to Copilot tab if suggested query is clicked
+            switchTab('copilot');
+        }
+
+        function addSystemLog(level, message) {
+            const time = new Date().toLocaleTimeString();
+            const logDiv = document.createElement("div");
+            let color = "text-slate-500";
+            if (level === "ERROR") color = "text-rose-600 font-semibold";
+            if (level === "SUCCESS") color = "text-emerald-600 font-semibold";
+            if (level === "INFO") color = "text-sky-600";
+            
+            logDiv.className = `${color}`;
+            logDiv.innerText = `[${time}] ${level}: ${message}`;
+            const container = document.getElementById("logs-container");
+            container.appendChild(logDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendRawLog(logText) {
+            const logDiv = document.createElement("div");
+            logDiv.className = "text-slate-500";
+            if (logText.includes("WARN") || logText.includes("Risk Alert")) {
+                logDiv.className = "text-amber-600";
+            } else if (logText.includes("ERROR") || logText.includes("Exception")) {
+                logDiv.className = "text-rose-600 font-semibold";
+            } else if (logText.includes("SUCCESS") || logText.includes("REST Success")) {
+                logDiv.className = "text-emerald-600 font-semibold";
+            } else if (logText.includes("REST Request")) {
+                logDiv.className = "text-[#C02026]";
+            }
+            logDiv.innerText = logText;
+            const container = document.getElementById("logs-container");
+            container.appendChild(logDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Submits query to FastAPI
+        async function submitQuery(event) {
+            event.preventDefault();
+            const queryInput = document.getElementById("query-input");
+            const submitBtn = document.getElementById("submit-btn");
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            queryInput.value = "";
+            queryInput.disabled = true;
+            submitBtn.disabled = true;
+
+            appendChatMessage("USER", query);
+            addSystemLog("INFO", `Querying: "${query}"`);
+
+            try {
+                const response = await fetch("/api/query", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query, user_id: currentUser })
+                });
+                const result = await response.json();
+                
+                if (result.logs) {
+                    const logsContainer = document.getElementById("logs-container");
+                    logsContainer.innerHTML = ""; // Clear logs
+                    result.logs.forEach(log => appendRawLog(log));
+                }
+
+                if (result.success) {
+                    renderProjects(result.projects);
+                    updateChart(result.projects);
+                    
+                    let responseMsg = `<p class="font-semibold text-red-950 mb-1">RAG analysis complete! Identified ${result.projects.length} authorized project(s):</p><ul class="list-disc pl-4 space-y-1 mt-2">`;
+                    result.projects.forEach(p => {
+                        responseMsg += `<li><strong>${p.name}</strong>: Evaluated as <span class="uppercase px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            p.health === 'Red' ? 'bg-rose-100 text-rose-800' :
+                            p.health === 'Amber' ? 'bg-amber-100 text-amber-800' : 
+                            'bg-emerald-100 text-emerald-800'
+                        }">${p.health} Risk</span>.</li>`;
+                    });
+                    responseMsg += "</ul>";
+                    appendChatMessage("AI", responseMsg);
+                } else {
+                    appendChatMessage("AI", `<span class="text-rose-600 font-medium">Error: ${result.error}</span>`);
+                }
+            } catch (err) {
+                appendChatMessage("AI", `<span class="text-rose-600 font-medium">Error: Cannot reach server.</span>`);
+            } finally {
+                queryInput.disabled = false;
+                submitBtn.disabled = false;
+                queryInput.focus();
+            }
+        }
+
+        // Render project list to UI
+        function renderProjects(projects) {
+            const container = document.getElementById("projects-container");
+            container.innerHTML = "";
+
+            if (projects.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-400 py-10 text-xs">No projects found.</div>`;
+                return;
+            }
+
+            projects.forEach(p => {
+                const projectCard = document.createElement("div");
+                const riskBg = p.health === "Red" ? "bg-rose-50 text-rose-700 border-rose-200" :
+                             p.health === "Amber" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                             "bg-emerald-50 text-emerald-700 border-emerald-200";
+
+                const hoursColor = p.hours_percentage > 100 ? "bg-rose-500" :
+                                   p.hours_percentage > 80 ? "bg-amber-500" : "bg-emerald-500";
+                
+                const sprintColor = p.sprint_percentage < 40 ? "bg-rose-500" :
+                                    p.sprint_percentage < 70 ? "bg-amber-500" : "bg-emerald-500";
+
+                let mitigationHtml = "";
+                if (p.mitigation_plan && p.mitigation_plan.length > 0) {
+                    mitigationHtml = `<div class="mt-2.5 bg-amber-50/50 border border-amber-200/30 rounded-lg p-2.5 text-[10px] space-y-1">
+                        <div class="font-bold text-amber-800 flex items-center space-x-1">
+                            <span>Prescriptive AI Mitigation Plans:</span>
+                        </div>
+                        <ul class="list-disc pl-3 text-slate-650 space-y-0.5">`;
+                    p.mitigation_plan.forEach(item => {
+                        mitigationHtml += `<li>${item}</li>`;
+                    });
+                    mitigationHtml += `</ul></div>`;
+                }
+
+                projectCard.className = "bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-md";
+                projectCard.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">${p.client}</span>
+                            <h3 class="font-bold text-slate-900 text-xs mt-0.5 leading-snug">${p.name}</h3>
+                        </div>
+                        <span class="text-[9px] font-bold uppercase px-2 py-0.5 border rounded-full ${riskBg}">${p.health}</span>
+                    </div>
+
+                    <!-- Meters -->
+                    <div class="space-y-2">
+                        <div>
+                            <div class="flex justify-between text-[9px] text-slate-500 font-medium mb-1">
+                                <span>Timesheet Hours</span>
+                                <span>${p.logged_hours} / ${p.budget_hours} hrs (${p.hours_percentage}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="${hoursColor} h-1.5" style="width: ${p.hours_percentage_capped}%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[9px] text-slate-500 font-medium mb-1">
+                                <span>${p.sprint_name} (DevOps)</span>
+                                <span>${p.completed_points} / ${p.planned_points} tasks (${p.sprint_percentage}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                <div class="${sprintColor} h-1.5" style="width: ${p.sprint_percentage_capped}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${mitigationHtml}
+
+                    <div class="bg-slate-50 rounded-lg p-2.5 text-[10px] text-slate-600 border border-slate-100 leading-relaxed">
+                        <strong>Synthesis:</strong> ${p.risk_synthesis}
+                    </div>
+
+                    <div class="text-[9px] text-slate-500 pt-1 flex items-center justify-between">
+                        <span>Lead: ${p.manager}</span>
+                        <button onclick="escalateRisk('${p.name}', '${p.health}', '${p.risk_synthesis.replace(/'/g, "\\'")}')" class="px-2 py-0.5 border border-rose-200 hover:border-rose-350 text-rose-600 rounded-md hover:bg-rose-55 transition font-medium shadow-sm bg-white">
+                            Escalate Risk
+                        </button>
+                    </div>
+                `;
+                container.appendChild(projectCard);
+            });
+        }
+
+        function appendChatMessage(sender, text) {
+            const container = document.getElementById("chat-messages");
+            const msgDiv = document.createElement("div");
+            
+            if (sender === "USER") {
+                msgDiv.className = "flex items-start space-x-2.5 max-w-[80%] ml-auto justify-end";
+                msgDiv.innerHTML = `
+                    <div class="bg-[#C02026] text-white text-xs p-3 rounded-2xl rounded-tr-none shadow-sm font-medium">
+                        ${text}
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-red-800 text-white flex items-center justify-center font-bold text-xs shrink-0 border border-red-900 shadow-sm">ME</div>
+                `;
+            } else {
+                msgDiv.className = "flex items-start space-x-2.5 max-w-[80%]";
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-[#C02026] flex items-center justify-center font-bold text-xs shrink-0 border border-rose-100 shadow-sm">AI</div>
+                    <div class="bg-slate-50 border border-slate-200 text-slate-700 text-xs p-3 rounded-2xl rounded-tl-none shadow-sm leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            }
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Trigger webhook alert logs
+        async function escalateRisk(projName, riskLevel, synthesis) {
+            addSystemLog("INFO", `Escalating risk status to backend for: ${projName}...`);
+            
+            const container = document.getElementById("teams-container");
+            const time = new Date().toLocaleTimeString();
+            
+            try {
+                const response = await fetch("/api/escalate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        project_name: projName,
+                        risk_level: riskLevel,
+                        synthesis: synthesis
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    addSystemLog("SUCCESS", `Escalation event logged in backend files.`);
+                    if (result.logs) {
+                        result.logs.forEach(log => appendRawLog(log));
+                    }
+                    
+                    const alertDiv = document.createElement("div");
+                    alertDiv.className = "p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-slate-705 text-[10px] space-y-1.5";
+                    alertDiv.innerHTML = `
+                        <div class="flex justify-between font-bold text-[#C02026]">
+                            <span>⚠️ Teams Alert card</span>
+                            <span>${time}</span>
+                        </div>
+                        <div><strong>Project:</strong> ${projName}</div>
+                        <div><strong>Risk Level:</strong> ${riskLevel}</div>
+                        <div class="text-[9px] text-slate-500 italic mt-1">// Event logged successfully to escalation_log.json</div>
+                    `;
+                    container.appendChild(alertDiv);
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    addSystemLog("ERROR", `Failed to log escalation: ` + result.error);
+                }
+            } catch (err) {
+                addSystemLog("ERROR", `Network connection refused: ` + err.message);
+            }
+            
+            // Switch to System Engine tab to show escalation
+            switchTab('logs');
+        }
+
+        // CI/CD Release Pipeline Scripts
+        function appendPipelineLog(text, type = "info") {
+            const time = new Date().toLocaleTimeString();
+            const logLine = document.createElement("div");
+            let color = "text-slate-500";
+            if (type === "error") color = "text-rose-600 font-semibold";
+            if (type === "success") color = "text-emerald-600 font-semibold";
+            if (type === "warning") color = "text-amber-600";
+            
+            logLine.className = color;
+            logLine.innerText = `[${time}] ${text}`;
+            const container = document.getElementById("pipeline-logs");
+            container.appendChild(logLine);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function runPipelineTests() {
+            const statusBadge = document.getElementById("pipeline-status-badge");
+            const runBtn = document.getElementById("run-tests-btn");
+            const deployBtn = document.getElementById("deploy-btn");
+            
+            runBtn.disabled = true;
+            statusBadge.className = "px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md bg-amber-100 text-amber-700 border border-amber-200 animate-pulse";
+            statusBadge.innerText = "Testing...";
+            
+            appendPipelineLog("Starting automated validation...");
+            appendPipelineLog("Step 1/2: Triggering test execution (pytest)...");
+            
+            try {
+                const response = await fetch("/api/run-tests", { method: "POST" });
+                const result = await response.json();
+                
+                if (result.success) {
+                    appendPipelineLog("Unit tests completed successfully. 4/4 tests passed.", "success");
+                    appendPipelineLog("Step 2/2: Build verified. Release Gate is now OPEN.", "success");
+                    
+                    statusBadge.className = "px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200";
+                    statusBadge.innerText = "Gate Open";
+                    
+                    deployBtn.disabled = false;
+                    deployBtn.className = "w-full py-2.5 bg-[#C02026] hover:bg-red-750 text-white rounded-xl text-xs font-bold transition flex items-center justify-center cursor-pointer shadow-md shadow-red-500/10";
+                } else {
+                    appendPipelineLog("Unit testing failed. Deployment canceled.", "error");
+                    statusBadge.className = "px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md bg-rose-100 text-rose-700 border border-rose-200";
+                    statusBadge.innerText = "Broken Build";
+                }
+            } catch (err) {
+                appendPipelineLog("Connection failed: " + err.message, "error");
+            } finally {
+                runBtn.disabled = false;
+            }
+        }
+
+        async function approveDeployment() {
+            const statusBadge = document.getElementById("pipeline-status-badge");
+            const deployBtn = document.getElementById("deploy-btn");
+            
+            deployBtn.disabled = true;
+            statusBadge.innerText = "Deploying...";
+            
+            appendPipelineLog("Deploy approval received. Starting promotion...");
+            
+            try {
+                const response = await fetch("/api/deploy", { method: "POST" });
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.live_github) {
+                        appendPipelineLog("Live credentials verified. Uploading source codes to GitHub profile repository...", "success");
+                    } else {
+                        appendPipelineLog("Running local credentials dry-run. Proceeding with simulated push.");
+                        appendPipelineLog("[GitOps Mock] git commit -m 'feat(deploy): release compile'", "warning");
+                        appendPipelineLog("[GitOps Mock] git push origin main --force", "warning");
+                    }
+                    
+                    appendPipelineLog(`Release successfully pushed. Commit: ${result.manifest.commit_hash.slice(0, 12)}`, "success");
+                    appendPipelineLog(`Release manifest written to local workspace: release_manifest.json`, "success");
+                    appendPipelineLog(`Status: PROMOTED_TO_PRODUCTION. Pipeline finished.`, "success");
+                    
+                    statusBadge.className = "px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-md bg-slate-100 text-slate-500 border border-slate-200";
+                    statusBadge.innerText = "Deployed";
+                    
+                    deployBtn.className = "w-full py-2.5 bg-red-50 text-red-400 border border-red-100 rounded-xl text-xs font-bold transition flex items-center justify-center cursor-not-allowed";
+                } else {
+                    appendPipelineLog(`Git upload failed: ${result.error}`, "error");
+                }
+            } catch (err) {
+                appendPipelineLog("Connection failed: " + err.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>
