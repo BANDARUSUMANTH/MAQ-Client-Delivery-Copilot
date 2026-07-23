@@ -1,0 +1,4 @@
+ProjectId,ProjectName,Manager,Client,HealthStatus,StartDate,EndDate,BudgetHours,ScopeDescription,AuthorizedUsers
+P001,Power BI Sales Dashboard,John Doe,Retail Corp,Green,2026-05-01,2026-08-30,400,"Build a sales performance dashboard using Power BI desktop connected to Azure SQL database. Requires row-level security.","user_admin,john_doe,manager1"
+P002,Dynamics Finance Integration,Jane Smith,Finance Inc,Amber,2026-04-15,2026-09-15,800,"Migrate on-prem financial operations to Dynamics 365 Finance and Operations including vendor accounts and billing workflows.","user_admin,jane_smith,manager1"
+P003,Power BI Executive Insights,Bob Johnson,Health Co,Red,2026-06-01,2026-10-01,500,"Create executive summary dashboards for hospital bed utilization. Severe scope creep due to clinical feedback and shifting requirements.","user_admin,bob_johnson,manager2"
