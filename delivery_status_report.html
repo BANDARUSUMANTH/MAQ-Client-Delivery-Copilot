@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAQ Software - Intelligent Client Delivery Status Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            
+            /* Status colors (Harmonious modern palette) */
+            --status-green: #10b981;
+            --status-green-bg: rgba(16, 185, 129, 0.1);
+            --status-amber: #f59e0b;
+            --status-amber-bg: rgba(245, 158, 11, 0.1);
+            --status-red: #ef4444;
+            --status-red-bg: rgba(239, 68, 68, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(139, 92, 246, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .logo-section h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-section p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        .meta-badge span {
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .meta-badge strong {
+            color: var(--text-primary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .card.green::before { background: var(--status-green); }
+        .card.amber::before { background: var(--status-amber); }
+        .card.red::before { background: var(--status-red); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+        }
+
+        .project-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .client-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.1rem;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.green {
+            color: var(--status-green);
+            background: var(--status-green-bg);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status-badge.amber {
+            color: var(--status-amber);
+            background: var(--status-amber-bg);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status-badge.red {
+            color: var(--status-red);
+            background: var(--status-red-bg);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .meta-item span {
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .meta-item strong {
+            color: var(--text-primary);
+        }
+
+        .details-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .visual-bar-container {
+            margin-bottom: 1rem;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+        }
+
+        .bar-outer {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .bar-inner {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 1s ease-out;
+        }
+
+        .bar-inner.green { background: var(--status-green); }
+        .bar-inner.amber { background: var(--status-amber); }
+        .bar-inner.red { background: var(--status-red); }
+
+        .analysis-text {
+            font-size: 0.85rem;
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--accent);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0 6px 6px 0;
+            margin-top: 0.5rem;
+        }
+
+        .wi-tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .wi-tag {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .wi-tag.done { border-color: rgba(16, 185, 129, 0.3); color: #a7f3d0; }
+        .wi-tag.progress { border-color: rgba(59, 130, 246, 0.3); color: #bfdbfe; }
+        .wi-tag.blocked { border-color: rgba(239, 68, 68, 0.4); color: #fecaca; }
+
+        .wi-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .wi-tag.done .wi-dot { background: var(--status-green); }
+        .wi-tag.progress .wi-dot { background: var(--accent); }
+        .wi-tag.blocked .wi-dot { background: var(--status-red); }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <h1>MAQ Software</h1>
+                <p>Client Delivery Insights Dashboard • Intelligent Agent Synthesis</p>
+            </div>
+            <div class="meta-badge">
+                <span>Audited Request User</span>
+                <strong>john_doe</strong>
+            </div>
+        </header>
+
+        <main>
+            <div class="metrics-grid">
+                
+                <div class="card green">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="project-title">Power BI Sales Dashboard</h2>
+                            <div class="client-name">Client: Retail Corp • Manager: John Doe</div>
+                        </div>
+                        <span class="status-badge green">Green</span>
+                    </div>
+
+                    <div class="project-meta">
+                        <div class="meta-item">
+                            <span>TIMELINE</span>
+                            <strong>2026-05-01 to 2026-08-30</strong>
+                        </div>
+                        <div class="meta-item">
+                            <span>BUDGET</span>
+                            <strong>400 Hours</strong>
+                        </div>
+                    </div>
+
+                    <!-- D365 Project Operations Timesheets -->
+                    <div class="details-section">
+                        <h3 class="section-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            D365 Timesheet Metrics
+                        </h3>
+                        <div class="visual-bar-container">
+                            <div class="bar-label">
+                                <span>Logged vs. Budget Hours</span>
+                                <span>120 / 400 hrs (30%)</span>
+                            </div>
+                            <div class="bar-outer">
+                                <div class="bar-inner green" style="width: 30%"></div>
+                            </div>
+                        </div>
+                        <p class="analysis-text" style="font-style: italic;">
+                            <strong>Timesheet Summary:</strong> Total of 3 entries logged. Consultants active: Alice Miller (120 hrs).
+                        </p>
+                    </div>
+
+                    <!-- Azure DevOps Sprint tracking -->
+                    <div class="details-section">
+                        <h3 class="section-title">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Azure DevOps: Sprint Info
+                        </h3>
+                        <div class="visual-bar-container">
+                            <div class="bar-label">
+                                <span>Sprint Story Points completed</span>
+                                <span>0 / 0 pts (0%)</span>
+                            </div>
+                            <div class="bar-outer">
+                                <div class="bar-inner red" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bar-label" style="margin-top:0.75rem;">Sprint Tasks status:</div>
+                        <div class="wi-tag-container">
+                            
+                        </div>
+                    </div>
+
+                    <!-- Orchestrator Synthesis & Warnings -->
+                    <div class="details-section" style="border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 1.5rem;">
+                        <h3 class="section-title" style="color: #c084fc;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            Insight Orchestrator Risk Assessment
+                        </h3>
+                        <p class="analysis-text" style="border-left-color: #c084fc; background: rgba(192, 132, 252, 0.05); color: #e9d5ff;">
+                            The Power BI Sales Dashboard project has a high risk associated with devops issues, particularly the failure to retrieve summary from AutoGen retrieval agent, which may indicate systemic weaknesses in data management and integration processes. timesheet logging rates are concerning with consultants such as Alice Miller completing 120 hours of work over just three entries logged, suggesting possible inadequate workload tracking or inefficient time allocation. This does not match well with a budgeted hours and logged hours ratio of approximately 60% allocated, indicating higher-than-projected task accomplishment.
+                        </p>
+                    </div>
+
+                </div>
+                
+            </div>
+        </main>
+
+        <footer>
+            <p>MAQ Software Capstone System Engine • Generated via Semantic Kernel & AutoGen Free Stack</p>
+            <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:0.5rem;">Simulated Entra ID Security Token Check: ACTIVE</p>
+        </footer>
+    </div>
+</body>
+</html>
