@@ -1,0 +1,10 @@
+TimesheetId,ProjectId,ProjectName,Consultant,WeekEnding,HoursLogged,TaskDescription,BillingRate
+T1001,P001,Power BI Sales Dashboard,Alice Miller,2026-07-03,40,"Configured Azure SQL connection and loaded initial sales schemas.",150
+T1002,P001,Power BI Sales Dashboard,Alice Miller,2026-07-10,42,"Designed visual templates and sales metrics calculations.",150
+T1003,P001,Power BI Sales Dashboard,Alice Miller,2026-07-17,38,"Implemented row-level security (RLS) for region managers.",150
+T1004,P002,Dynamics Finance Integration,Charlie Green,2026-07-03,45,"Mapped ledger schemas and loaded customer vendor data.",180
+T1005,P002,Dynamics Finance Integration,Charlie Green,2026-07-10,48,"Began validation of invoice ingestion pipelines, minor logic bugs found.",180
+T1006,P002,Dynamics Finance Integration,Charlie Green,2026-07-17,50,"Testing invoice ingestion performance, delay in API approvals from client.",180
+T1007,P003,Power BI Executive Insights,David White,2026-07-03,55,"Designed dashboards for bed utilization, client requested major layout alterations.",160
+T1008,P003,Power BI Executive Insights,David White,2026-07-10,62,"Overtime to redesign bed occupancy logic. Scope extended to emergency room workflows.",160
+T1009,P003,Power BI Executive Insights,David White,2026-07-17,68,"Overtime work due to new requirements for physician schedule visualization.",160
